@@ -139,9 +139,16 @@ def gen_service():
 
 def compile():
         if os.path.exists('./tmp_service.c'):
+                if os.path.exists(args.output):
+                        os.remove(args.output)
                 print("compiling...")
                 subprocess.run(["/usr/bin/x86_64-w64-mingw32-gcc","-mwindows","-O2","-s","-o",args.output,"tmp_service.c"], shell=False, stderr=subprocess.DEVNULL) # mingw will likely complain, so STDERR goes to /dev/null
-                os.remove('./tmp_service.c')
+                if (os.path.exists(args.output) == False):
+                        result = subprocess.run(["/usr/bin/x86_64-w64-mingw32-gcc","-Wno-incompatible-pointer-types","-mwindows","-O2","-s","-o",args.output,"tmp_service.c"], shell=False, capture_output=True)
+                        if (os.path.exists(args.output) == False):
+                                print("/!\\ error compiling - see output below:")
+                                print(result.stderr.decode())
+                os.remove("./tmp_service.c")
         else:
                 print("'tmp_service.c' file missing - aborting")
                 exit()
